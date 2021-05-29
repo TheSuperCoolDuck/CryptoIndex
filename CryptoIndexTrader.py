@@ -49,7 +49,6 @@ def RebalancePortfolio():
     overweightedCoins = GetOverweightedCoins(allocationDifferences)
     underweightedCoins = GetUnderweightedCoins(allocationDifferences)
 
-    """
     print('ACCOUNT BALANCE')
     for accountCoin in accountBalanceUSD:
         print(f"{accountCoin[0]} : ${accountCoin[1]:.2f}")
@@ -80,7 +79,6 @@ def RebalancePortfolio():
     for coinData in underweightedCoins:
         print(f"{coinData[0]} : ${coinData[1]:.2f}")
     print()
-    """
 
     if MAKE_TRADE:
         # Sell overweighted assets for USDT
@@ -93,13 +91,11 @@ def RebalancePortfolio():
         accountBalanceUSD = CurrentAccountBalance(accountData, marketData)
         accountBalanceTotal = SumBalance(accountBalanceUSD)
 
-        """
         print()
         print('NEW ALLOCATION')
         for coinData in accountBalanceUSD:
             percentage = (coinData[1]/accountBalanceTotal)*100
             print(f"{coinData[0]} : {percentage:.2f}%")
-        """
 
 # Get the top non-stablecoin/privacycoins cryptos that would be used for the index portfolio
 def GetIndexCoins(marketData, binanceVaildCoins):
@@ -226,7 +222,7 @@ def SellOverweightedCoins(overweightedCoins, marketData):
         tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
         amount = coinData[1] / CurrentCoinPrice(coinData[0],marketData)
         convertedAmount = ConvertToStepSize(tradingPair,amount)
-        #print(f"SELL: {tradingPair} : {convertedAmount}")
+        print(f"SELL: {tradingPair} : {convertedAmount}")
         BinanceClient.order_market_sell(symbol = tradingPair, quantity = convertedAmount)
 
 # Buy underweighted coins so that it matches the ideal allocation
@@ -247,7 +243,7 @@ def BuyUnderweightedCoins(underweightedCoins, marketData):
             amount -= amount*TRADING_FEE
         convertedAmount = ConvertToStepSize(tradingPair,amount)
         if(convertedAmount > 0):
-            #print(f"BUY: {tradingPair} : {convertedAmount}")
+            print(f"BUY: {tradingPair} : {convertedAmount}")
             BinanceClient.order_market_buy(symbol = tradingPair, quantity = convertedAmount)
 
 # Get the current trading price on binance
