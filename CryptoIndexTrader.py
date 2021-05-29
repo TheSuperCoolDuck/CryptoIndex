@@ -13,7 +13,7 @@ INDEX_COIN_COUNT = 10
 STABLECOINS = ('usdt', 'usdc', 'busd', 'dai', 'ust', 'lusd', 'pax', 'fei', 'tusd', 'husd', 'usdn', 'susd', 'vai', 'usdp', 'frax', 'gusd', 'esd', 'usdx', 'seur', 'krt', 'eurs', 'musd', 'usdk', 'tryb', 'bac', 'dusd', 'ousd', 'dsd', 'bitcny', 'eosdt', 'mic', 'rsv', 'debase', 'onc', 'saud', 'bsd', 'sac', 'qusd', 'qc', 'usd', 'xdai', 'iron', 'usds', 'thkd', 'ebase', 'usnbt', 'bdo')
 PRIVACY_COINS = ('xmr','dash','zec','dcr','dgb','zen','arrr','xvg','xhv','scrt','firo','mask','bcn','beam','grs','pivx','sero','dusk','oxen','dero','apl','grin','nav','trtl','part','zano','flux','onion','nix','eng','phr','btcz','prcy','ccx','ghost','daps','epic','sumo','alias','veil','zcl','zer','bc','msr','krb','hush','axe','crp','btcn','anc','dev','btcx','lithn','kurt','hatch','xfg','wscrt','aeon','hopr','bdx')
 TRADING_QUOTE_ASSET = 'usdt'
-
+ 
 DUST_AMOUNT = 1
 
 MIN_ORDER_SIZE = 10
