@@ -1,2 +1,2 @@
 # CryptoIndex
-A trading bot that will buy and hold the top cryptocurrencies and rebalance the position in set periods
+A trading bot that holds the top cryptocurrencies that can rebalance its position
