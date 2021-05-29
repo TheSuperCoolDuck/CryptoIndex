@@ -1,4 +1,5 @@
 import os
+
 from binance.client import Client
 from pycoingecko import CoinGeckoAPI
 
@@ -26,7 +27,7 @@ TRADING_FEE = 0.001
 # 0: even weighting
 DOMINANCE_ADJUST = 0.4
 
-def Main():
+def RebalancePortfolio():
     # Get the market data from the coingecko api
     marketData = CG.get_coins_markets(vs_currency='usd', per_page=250)
 
@@ -271,5 +272,3 @@ def GetCoinAccountBalance(symbol, accountData):
         if coinData['asset'].lower() == symbol:
             return float(coinData['free'])
     return 0
-
-Main()
