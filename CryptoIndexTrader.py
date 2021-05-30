@@ -3,6 +3,8 @@ import os
 from binance.client import Client
 from pycoingecko import CoinGeckoAPI
 
+# Switch to true when you want to make real trades
+# False when you want to debug
 MAKE_TRADE = False
 
 CG = CoinGeckoAPI()
@@ -228,23 +230,26 @@ def SellOverweightedCoins(overweightedCoins, marketData):
 # Buy underweighted coins so that it matches the ideal allocation
 def BuyUnderweightedCoins(underweightedCoins, marketData):
     for i in range(0,len(underweightedCoins)):
-        coinData = underweightedCoins[i]
-        tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
-        amount = 0
+        newAccountData = BinanceClient.get_account()
 
-        # Buy the calulated amount on all buy the last coin
-        # Buy the maximum possible amount given the account balance on the last coin
-        # This is done because the weighted is calculated based on the coinGecko API but binance could have different prices
-        if(i < len(underweightedCoins)-1):
-            amount = coinData[1] / CurrentCoinPrice(coinData[0],marketData)
-        else:
-            newAccountData = BinanceClient.get_account()
-            amount = GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData) / BinanceGetLatestPrice(tradingPair)
-            amount -= amount*TRADING_FEE
-        convertedAmount = ConvertToStepSize(tradingPair,amount)
-        if(convertedAmount > 0):
-            print(f"BUY: {tradingPair} : {convertedAmount}")
-            BinanceClient.order_market_buy(symbol = tradingPair, quantity = convertedAmount)
+        # Make sure that the trade can actually be executed
+        if(GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData)>MIN_ORDER_SIZE*TRADING_FEE):
+          coinData = underweightedCoins[i]
+          tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
+          amount = 0
+
+          # Buy the calulated amount on all buy the last coin
+          # Buy the maximum possible amount given the account balance on the last coin
+          # This is done because the weighted is calculated based on the coinGecko API but binance could have different prices
+          if(i < len(underweightedCoins)-1):
+              amount = coinData[1] / CurrentCoinPrice(coinData[0],marketData)
+          else:
+              amount = GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData) / BinanceGetLatestPrice(tradingPair)
+              amount -= amount*TRADING_FEE
+          convertedAmount = ConvertToStepSize(tradingPair,amount)
+          if(convertedAmount > 0):
+              print(f"BUY: {tradingPair} : {convertedAmount}")
+              BinanceClient.order_market_buy(symbol = tradingPair, quantity = convertedAmount)
 
 # Get the current trading price on binance
 def BinanceGetLatestPrice(tradingPair):
