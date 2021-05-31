@@ -231,25 +231,31 @@ def SellOverweightedCoins(overweightedCoins, marketData):
 def BuyUnderweightedCoins(underweightedCoins, marketData):
     for i in range(0,len(underweightedCoins)):
         newAccountData = BinanceClient.get_account()
+        accountBalanceUSDT = GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData)
 
         # Make sure that the trade can actually be executed
-        if(GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData)>MIN_ORDER_SIZE*TRADING_FEE):
-          coinData = underweightedCoins[i]
-          tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
-          amount = 0
+        if(accountBalanceUSDT>MIN_ORDER_SIZE*TRADING_FEE):
+            coinData = underweightedCoins[i]
+            tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
+            amountUSDT = 0
 
-          # Buy the calulated amount on all buy the last coin
-          # Buy the maximum possible amount given the account balance on the last coin
-          # This is done because the weighted is calculated based on the coinGecko API but binance could have different prices
-          if(i < len(underweightedCoins)-1):
-              amount = coinData[1] / CurrentCoinPrice(coinData[0],marketData)
-          else:
-              amount = GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData) / BinanceGetLatestPrice(tradingPair)
-              amount -= amount*TRADING_FEE
-          convertedAmount = ConvertToStepSize(tradingPair,amount)
-          if(convertedAmount > 0):
-              print(f"BUY: {tradingPair} : {convertedAmount}")
-              BinanceClient.order_market_buy(symbol = tradingPair, quantity = convertedAmount)
+            # Check if it's the last coin to be traded  
+            if(i < len(underweightedCoins)-1):
+
+                # CASE 1: Not the last order
+                # Buy the calculated amount else buy the maximum amount given the account balance
+                amountUSDT = min(coinData[1],accountBalanceUSDT)
+            else:
+
+                # CASE 2: Last Order
+                # Buy the maximum amount given the account balance
+                amountUSDT = accountBalanceUSDT
+                
+            amount = amountUSDT / CurrentCoinPrice(coinData[0],marketData)
+            amount -= amount*TRADING_FEE
+            convertedAmount = ConvertToStepSize(tradingPair,amount)
+            print(f"BUY: {tradingPair} : {convertedAmount}")
+            BinanceClient.order_market_buy(symbol = tradingPair, quantity = convertedAmount)
 
 # Get the current trading price on binance
 def BinanceGetLatestPrice(tradingPair):
