@@ -5,7 +5,7 @@ from pycoingecko import CoinGeckoAPI
 
 # Switch to true when you want to make real trades
 # False when you want to debug
-MAKE_TRADE = False
+MAKE_TRADE = True
 
 CG = CoinGeckoAPI()
 
@@ -31,7 +31,7 @@ DOMINANCE_ADJUST = 0.4
 
 def RebalancePortfolio():
     # Get the market data from the coingecko api
-    marketData = CG.get_coins_markets(vs_currency='usd', per_page=250)
+    marketData = CG.get_coins_markets(vs_currency='usd' , per_page=250)
 
     # Get the exchange info from the binance api
     binanceData = BinanceClient.get_exchange_info()
@@ -83,8 +83,9 @@ def RebalancePortfolio():
     print()
 
     if MAKE_TRADE:
+
         # Sell overweighted assets for USDT
-        SellOverweightedCoins(overweightedCoins, marketData)
+        SellOverweightedCoins(overweightedCoins, marketData, accountData)
 
         # Buy underweighted assets using USDT
         BuyUnderweightedCoins(underweightedCoins, marketData)
@@ -219,10 +220,10 @@ def GetUnderweightedCoins(allocationDifferences):
     return underweightedCoins
 
 # Sell overweighted coins so that it matches the ideal allocation
-def SellOverweightedCoins(overweightedCoins, marketData):
+def SellOverweightedCoins(overweightedCoins, marketData, accountData):
     for coinData in overweightedCoins:
         tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
-        amount = coinData[1] / CurrentCoinPrice(coinData[0],marketData)
+        amount = min(4577687986758, coinData[1] / CurrentCoinPrice(coinData[0],marketData))
         convertedAmount = ConvertToStepSize(tradingPair,amount)
         print(f"SELL: {tradingPair} : {convertedAmount}")
         BinanceClient.order_market_sell(symbol = tradingPair, quantity = convertedAmount)
@@ -270,8 +271,7 @@ def ConvertToStepSize(tradingPair, amount):
     info = BinanceClient.get_symbol_info(tradingPair)
     stepSize = float(info['filters'][2]['stepSize'])
     converted = (amount//stepSize)*stepSize
-    formatted = float(f'{converted:g}')
-    return formatted
+    return converted
 
 # Get the current balance of a specific coin in the account
 def GetCoinAccountBalance(symbol, accountData):
