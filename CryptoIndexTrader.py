@@ -1,4 +1,5 @@
 import os
+import math
 
 from binance.client import Client
 from pycoingecko import CoinGeckoAPI
@@ -235,7 +236,7 @@ def BuyUnderweightedCoins(underweightedCoins, marketData):
         accountBalanceUSDT = GetCoinAccountBalance(TRADING_QUOTE_ASSET,newAccountData)
 
         # Make sure that the trade can actually be executed
-        if(accountBalanceUSDT>MIN_ORDER_SIZE*TRADING_FEE):
+        if(accountBalanceUSDT>(MIN_ORDER_SIZE*(1+TRADING_FEE))):
             coinData = underweightedCoins[i]
             tradingPair = (coinData[0]+TRADING_QUOTE_ASSET).upper()
             amountUSDT = 0
@@ -251,7 +252,7 @@ def BuyUnderweightedCoins(underweightedCoins, marketData):
                 # CASE 2: Last Order
                 # Buy the maximum amount given the account balance
                 amountUSDT = accountBalanceUSDT
-                
+            
             amount = amountUSDT / CurrentCoinPrice(coinData[0],marketData)
             amount -= amount*TRADING_FEE
             convertedAmount = ConvertToStepSize(tradingPair,amount)
@@ -270,7 +271,8 @@ def BinanceGetLatestPrice(tradingPair):
 def ConvertToStepSize(tradingPair, amount):
     info = BinanceClient.get_symbol_info(tradingPair)
     stepSize = float(info['filters'][2]['stepSize'])
-    converted = (amount//stepSize)*stepSize
+    sigfig = -int(round(math.log(stepSize,10)))
+    converted = round(amount,sigfig)
     return converted
 
 # Get the current balance of a specific coin in the account
